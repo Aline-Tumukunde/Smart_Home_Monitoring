@@ -66,8 +66,11 @@ export default function App() {
 
   const loadLanguage = async () => {
     try {
-      const locale = await Localization.localeAsync();
-      const preferredLanguage = locale.split("-")[0];
+      const preferredLocales = await Localization.localesAsync();
+      const preferredLanguages = preferredLocales.map(locale => locale.languageCode);
+
+      // For simplicity, we'll use the first preferred language
+      const preferredLanguage = preferredLanguages[0];
       setLanguage(preferredLanguage);
 
       // Load translations dynamically based on preferred language
