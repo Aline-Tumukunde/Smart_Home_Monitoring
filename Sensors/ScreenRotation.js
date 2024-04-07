@@ -1,32 +1,22 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React from 'react';
 import { ScreenOrientation } from 'expo';
 
-const ScreenRotation = ({ children }) => {
-  useEffect(() => {
-    async function changeScreenOrientation() {
-      await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
-    }
-    changeScreenOrientation();
-    
-    return async () => {
-      await ScreenOrientation.unlockAsync();
+export default function ScreenRotation({ children, orientation }) {
+  React.useEffect(() => {
+    const setScreenOrientation = async () => {
+      if (orientation === 'landscape') {
+        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+      } else {
+        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+      }
     };
-  }, []);
 
-  return (
-    <View style={styles.container}>
-      {children}
-    </View>
-  );
-};
+    setScreenOrientation();
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
+    return () => {
+      ScreenOrientation.unlockAsync();
+    };
+  }, [orientation]);
 
-export default ScreenRotation;
+  return <>{children}</>;
+}

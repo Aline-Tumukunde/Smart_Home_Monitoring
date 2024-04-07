@@ -66,17 +66,17 @@ const styles = StyleSheet.create({
     width: 300,
     height: 300,
     borderRadius: 150,
-    borderColor: 'white', // Changed line color to white
+    borderColor: 'white',
     borderWidth: 2,
     position: 'relative',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'black',
+    backgroundColor: 'skyblue',
   },
   directionText: {
     position: 'absolute',
     fontSize: 16,
-    color: 'white', // Changed text color to white
+    color: 'white',
   },
   north: {
     top: 10,
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 2,
     height: '40%',
-    backgroundColor: 'white', // Changed needle color to white
+    backgroundColor: 'white',
     top: '50%',
     left: '50%',
     marginLeft: -1,
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   },
   info: {
     fontSize: 20,
-    color: 'black', // Changed text color to black
+    color: 'black',
   },
 });
 

@@ -7,7 +7,8 @@ import MapScreen from './Sensors/MapScreen';
 import StepCounter from './Sensors/StepCounter';
 import LightSensorScreen from './Sensors/LightSensorScreen';
 import CompassScreen from './Sensors/CompassScreen';
-import { Localization } from 'expo';
+import * as Localization from 'expo-localization';
+import SettingsScreen from './Sensors/SettingsScreen'; // Corrected import
 
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
@@ -66,11 +67,9 @@ export default function App() {
 
   const loadLanguage = async () => {
     try {
-      const preferredLocales = await Localization.localesAsync();
-      const preferredLanguages = preferredLocales.map(locale => locale.languageCode);
+      const currentLocale = await Localization.localeAsync();
+      const preferredLanguage = currentLocale.split("-")[0];
 
-      // For simplicity, we'll use the first preferred language
-      const preferredLanguage = preferredLanguages[0];
       setLanguage(preferredLanguage);
 
       // Load translations dynamically based on preferred language
@@ -90,6 +89,7 @@ export default function App() {
     <NavigationContainer>
       <Drawer.Navigator>
         <Drawer.Screen name={translate('main')} component={MainTabNavigator} />
+        <Drawer.Screen name={translate('settings')} component={SettingsScreen} /> {/* Display SettingsScreen in Drawer navigation */}
       </Drawer.Navigator>
     </NavigationContainer>
   );

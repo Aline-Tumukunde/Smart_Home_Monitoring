@@ -1,54 +1,54 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Platform } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { LightSensor } from 'expo-sensors';
-import { NativeModules } from 'react-native';
 
-const { TorchModule } = NativeModules;
-
-const LightSensorScreen = () => {
-  const [isDark, setIsDark] = useState(false);
+export default function App() {
+  const [lightData, setLightData] = useState(null);
 
   useEffect(() => {
-    const subscribeToLightSensor = async () => {
-      LightSensor.addListener(({ light }) => {
-        setIsDark(light < 100); // Adjust the threshold as per your requirement
-      });
-    };
-
-    subscribeToLightSensor();
-
+    _subscribe();
     return () => {
-      LightSensor.removeAllListeners();
+      _unsubscribe();
     };
   }, []);
 
-  useEffect(() => {
-    const controlFlashlight = () => {
-      if (TorchModule && TorchModule.toggleFlashlight) {
-        const shouldTurnOnLight = !isDark; // Inverse the value of isDark to turn on the light when it's dark
-        TorchModule.toggleFlashlight(shouldTurnOnLight);
+  const _subscribe = () => {
+    LightSensor.isAvailableAsync().then(
+      result => {
+        if (result) {
+          LightSensor.addListener(({ lightIntensity }) => {
+            setLightData(lightIntensity);
+          });
+        } else {
+          console.log('Light sensor is not available');
+        }
+      },
+      error => {
+        console.log('Error checking for light sensor availability:', error);
       }
-    };
+    );
+  };
 
-    controlFlashlight();
-  }, [isDark]);
+  const _unsubscribe = () => {
+    LightSensor.removeAllListeners();
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Light Sensor: {isDark ? 'Dark' : 'Bright'}</Text>
+      <Text style={styles.text}>Light Intensity: {lightData !== null ? lightData.toFixed(2) : 'Loading...'}</Text>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#fff',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   text: {
     fontSize: 20,
+    fontWeight: 'bold',
   },
 });
-
-export default LightSensorScreen;
