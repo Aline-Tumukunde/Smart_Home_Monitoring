@@ -88,14 +88,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'lightblue', // Background color
+    backgroundColor: 'lightblue',
   },
   text: {
     fontSize: 24,
     marginBottom: 20,
-    color: '#333', // Text color
-    fontFamily: 'ArialItalic', // Font family
-    fontStyle: 'italic', // Font style
+    color: '#333',
+    // fontFamily: 'italic',
+    fontStyle: 'italic',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 5,
-    fontFamily: 'Arial', // Font family
+    fontFamily: 'Arial',
   },
   activityIndicator: {
     marginTop: 20,

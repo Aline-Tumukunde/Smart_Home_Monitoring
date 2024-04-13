@@ -1,41 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { LightSensor } from 'expo-sensors';
+import { Brightness } from 'expo';
 
 export default function App() {
-  const [lightData, setLightData] = useState(null);
+  const [brightnessLevel, setBrightnessLevel] = useState(1); // Initial brightness level
 
   useEffect(() => {
-    _subscribe();
+    const _getBrightness = async () => {
+      try {
+        const currentBrightness = await Brightness.getSystemBrightnessAsync();
+        setBrightnessLevel(currentBrightness);
+      } catch (error) {
+        console.error('Error getting brightness:', error);
+      }
+    };
+
+    _getBrightness();
+
+    // Set up a listener for changes in ambient light and update brightness level
+    const brightnessListener = Brightness.addBrightnessChangeListener(({ brightness }) => {
+      setBrightnessLevel(brightness);
+    });
+
+    // Clean up listener
     return () => {
-      _unsubscribe();
+      brightnessListener.remove();
     };
   }, []);
 
-  const _subscribe = () => {
-    LightSensor.isAvailableAsync().then(
-      result => {
-        if (result) {
-          LightSensor.addListener(({ lightIntensity }) => {
-            setLightData(lightIntensity);
-          });
-        } else {
-          console.log('Light sensor is not available');
-        }
-      },
-      error => {
-        console.log('Error checking for light sensor availability:', error);
-      }
-    );
-  };
-
-  const _unsubscribe = () => {
-    LightSensor.removeAllListeners();
+  // Function to adjust screen brightness based on ambient light
+  const adjustBrightness = async (brightness) => {
+    try {
+      await Brightness.setSystemBrightnessAsync(brightness);
+    } catch (error) {
+      console.error('Error setting brightness:', error);
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Light Intensity: {lightData !== null ? lightData.toFixed(2) : 'Loading...'}</Text>
+      <Text style={styles.text}>Auto Brightness: {brightnessLevel}</Text>
+      {/* You can display brightnessLevel in whatever way you want */}
     </View>
   );
 }

@@ -1,8 +1,11 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import { useTranslation } from 'react-i18next'; // Import the useTranslation hook
 
 const MapScreen = () => {
+  const { t } = useTranslation(); // Use the useTranslation hook to access translation function
+
   return (
     <View style={styles.container}>
       <MapView
@@ -16,8 +19,8 @@ const MapScreen = () => {
       >
         <Marker
           coordinate={{ latitude: 37.78825, longitude: -122.4324 }}
-          title="Marker"
-          description="This is a marker"
+          title={t('marker_title')} // Translate the marker title
+          description={t('marker_description')} // Translate the marker description
         />
       </MapView>
     </View>
