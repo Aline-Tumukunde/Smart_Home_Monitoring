@@ -1,7 +1,10 @@
+// App.js
+
 import React, { useState, useEffect, createContext } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Modal, Button } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import * as ScreenOrientation from 'expo-screen-orientation';
@@ -10,8 +13,10 @@ import StepCounter from './Sensors/StepCounter';
 import LightSensorScreen from './Sensors/LightSensorScreen';
 import CompassScreen from './Sensors/CompassScreen';
 import LocalizationScreen from './Sensors/LocalizationScreen';
+import BrightnessSensorScreen from './Sensors/BrightSensorScreen'; // Import the BrightnessSensorScreen component
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import Constants from 'expo-constants';
 
 // Initialize i18next with translations
 i18next.use(initReactI18next).init({
@@ -137,6 +142,19 @@ const MainTabNavigator = () => {
   );
 };
 
+// Create Drawer Navigator
+const Drawer = createDrawerNavigator();
+
+// Define Drawer Navigator
+const DrawerNavigator = () => {
+  return (
+    <Drawer.Navigator>
+      <Drawer.Screen name="Main" component={MainTabNavigator} />
+      <Drawer.Screen name="BrightnessSensorScreen" component={BrightnessSensorScreen} />
+    </Drawer.Navigator>
+  );
+};
+
 // App component
 export default function App() {
   const [orientation, setOrientation] = useState('PORTRAIT');
@@ -177,7 +195,7 @@ export default function App() {
         <Stack.Navigator>
           <Stack.Screen
             name="MainTab"
-            component={MainTabNavigator}
+            component={DrawerNavigator} // Use DrawerNavigator instead of MainTabNavigator directly
             options={{ headerShown: false }}
           />
         </Stack.Navigator>

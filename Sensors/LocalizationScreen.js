@@ -4,6 +4,7 @@ import { Accelerometer } from 'expo-sensors';
 import i18next from 'i18next';
 import { initReactI18next, useTranslation } from 'react-i18next';
 
+
 // Initialize i18next with translations
 i18next
   .use(initReactI18next)

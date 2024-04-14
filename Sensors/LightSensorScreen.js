@@ -1,46 +1,53 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Brightness } from 'expo';
+import { StyleSheet, View, Text } from 'react-native';
+import { LightSensor } from 'expo-sensors';
 
 export default function App() {
-  const [brightnessLevel, setBrightnessLevel] = useState(1); // Initial brightness level
+  const [illuminance, setIlluminance] = useState(0);
 
   useEffect(() => {
-    const _getBrightness = async () => {
+    let isMounted = true;
+
+    const subscribeToLightSensor = async () => {
       try {
-        const currentBrightness = await Brightness.getSystemBrightnessAsync();
-        setBrightnessLevel(currentBrightness);
+        // Check if LightSensor is available
+        if (!(await LightSensor.isAvailableAsync())) {
+          console.warn('Light sensor is not available.');
+          // Simulate illuminance values
+          const interval = setInterval(() => {
+            const simulatedIlluminance = Math.random() * 1000; // Generate random illuminance value
+            if (isMounted) {
+              setIlluminance(simulatedIlluminance);
+            }
+          }, 1000); // Update every second
+          
+          // Clean up interval
+          return () => clearInterval(interval);
+        }
+
+        // Subscribe to changes in illuminance
+        LightSensor.addListener(handleLightChange);
       } catch (error) {
-        console.error('Error getting brightness:', error);
+        console.error('Error subscribing to light sensor:', error);
       }
     };
 
-    _getBrightness();
+    subscribeToLightSensor();
 
-    // Set up a listener for changes in ambient light and update brightness level
-    const brightnessListener = Brightness.addBrightnessChangeListener(({ brightness }) => {
-      setBrightnessLevel(brightness);
-    });
-
-    // Clean up listener
+    // Clean up subscription
     return () => {
-      brightnessListener.remove();
+      isMounted = false;
+      LightSensor.removeAllListeners();
     };
   }, []);
 
-  // Function to adjust screen brightness based on ambient light
-  const adjustBrightness = async (brightness) => {
-    try {
-      await Brightness.setSystemBrightnessAsync(brightness);
-    } catch (error) {
-      console.error('Error setting brightness:', error);
-    }
+  const handleLightChange = ({ illuminance }) => {
+    setIlluminance(illuminance);
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Auto Brightness: {brightnessLevel}</Text>
-      {/* You can display brightnessLevel in whatever way you want */}
+      <Text style={styles.text}>Illuminance: {illuminance.toFixed(2)} lux</Text>
     </View>
   );
 }
