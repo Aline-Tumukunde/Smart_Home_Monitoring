@@ -3,9 +3,8 @@ import { Text, View, Button } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
 import i18next from 'i18next';
 import { initReactI18next, useTranslation } from 'react-i18next';
+import 'intl-pluralrules';
 
-
-// Initialize i18next with translations
 i18next
   .use(initReactI18next)
   .init({
@@ -26,6 +25,7 @@ i18next
         },
       },
     },
+    compatibilityJSON: 'v3', // Add this line
   });
 
 const Localization = () => {

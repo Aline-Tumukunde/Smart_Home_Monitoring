@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, Button, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { Text, View, Button, StyleSheet, ActivityIndicator, Alert, Animated } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
 
 export default function StepCounter() {
@@ -9,7 +9,9 @@ export default function StepCounter() {
   const [isPeak, setIsPeak] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const threshold = 0.1;
-  const updateInterval = 50;
+  const updateInterval = 100;
+
+  const translateYAnimation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     let subscription;
@@ -25,7 +27,14 @@ export default function StepCounter() {
         } else if (isPeak && acceleration < lastAcceleration) {
           setIsPeak(false);
           if (delta > threshold) {
-            setSteps(prevSteps => prevSteps + 1);
+            setSteps(prevSteps => {
+              animateSteps();
+              return prevSteps + 1;
+            });
+          } else {
+            if (delta > threshold / 2) { 
+              Alert.alert('Other Motion Detected');
+            }
           }
         }
       }
@@ -57,12 +66,30 @@ export default function StepCounter() {
     };
   }, [isTracking, lastAcceleration, isPeak]);
 
+  const animateSteps = () => {
+    Animated.sequence([
+      Animated.timing(translateYAnimation, {
+        toValue: -50, // Adjust this value to control how far the steps move upwards
+        duration: 250, // Adjust animation duration as needed
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateYAnimation, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
   const resetSteps = () => {
     setSteps(0);
   };
 
   return (
     <View style={styles.container}>
+      <Animated.View style={{ transform: [{ translateY: translateYAnimation }] }}>
+        <Text style={styles.text}>🦵</Text>
+      </Animated.View>
       <Text style={styles.text}>Steps: {steps}</Text>
       <View style={styles.buttonContainer}>
         <Button
@@ -109,6 +136,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Arial',
   },
   activityIndicator: {
-    marginTop: 20,
+    marginTop: 10,
   },
 });

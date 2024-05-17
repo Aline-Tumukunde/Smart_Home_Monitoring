@@ -8,7 +8,7 @@ import StepCounter from './Sensors/StepCounter';
 import LightSensorScreen from './Sensors/LightSensorScreen';
 import CompassScreen from './Sensors/CompassScreen';
 import * as Localization from 'expo-localization';
-import SettingsScreen from './Sensors/SettingsScreen'; // Corrected import
+import SettingsScreen from './Sensors/SettingsScreen'; 
 
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();

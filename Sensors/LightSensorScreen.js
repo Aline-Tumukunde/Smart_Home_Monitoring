@@ -1,66 +1,186 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Platform, Modal, TouchableHighlight } from 'react-native';
 import { LightSensor } from 'expo-sensors';
+import { FontAwesome5 } from '@expo/vector-icons';
+import * as Notifications from 'expo-notifications';
 
-export default function App() {
-  const [illuminance, setIlluminance] = useState(0);
+export default function LightSensorComponent() {
+    const [illuminance, setIlluminance] = useState(0);
+    const [iconColor, setIconColor] = useState("#333");
+    const [modalVisible, setModalVisible] = useState(false);
+    const [notification, setNotification] = useState(null);
+    const [subscription, setSubscription] = useState(null);
 
-  useEffect(() => {
-    let isMounted = true;
+    useEffect(() => {
+        _toggle();
 
-    const subscribeToLightSensor = async () => {
-      try {
-        // Check if LightSensor is available
-        if (!(await LightSensor.isAvailableAsync())) {
-          console.warn('Light sensor is not available.');
-          // Simulate illuminance values
-          const interval = setInterval(() => {
-            const simulatedIlluminance = Math.random() * 1000; // Generate random illuminance value
-            if (isMounted) {
-              setIlluminance(simulatedIlluminance);
-            }
-          }, 1000); // Update every second
-          
-          // Clean up interval
-          return () => clearInterval(interval);
+        return () => {
+            _unsubscribe();
+        };
+    }, []);
+
+    const _toggle = () => {
+        if (subscription) {
+            _unsubscribe();
+        } else {
+            _subscribe();
         }
-
-        // Subscribe to changes in illuminance
-        LightSensor.addListener(handleLightChange);
-      } catch (error) {
-        console.error('Error subscribing to light sensor:', error);
-      }
     };
 
-    subscribeToLightSensor();
-
-    // Clean up subscription
-    return () => {
-      isMounted = false;
-      LightSensor.removeAllListeners();
+    const _subscribe = () => {
+        const sub = LightSensor.addListener(({ illuminance }) => {
+            setIlluminance(illuminance);
+            checkIlluminanceThreshold(illuminance);
+        });
+        setSubscription(sub);
     };
-  }, []);
 
-  const handleLightChange = ({ illuminance }) => {
-    setIlluminance(illuminance);
-  };
+    const _unsubscribe = () => {
+        subscription && subscription.remove();
+        setSubscription(null);
+    };
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Illuminance: {illuminance.toFixed(2)} lux</Text>
-    </View>
-  );
+    const checkIlluminanceThreshold = (illum) => {
+        if (illum > 100) {
+            setNotification('High Light Alert: The ambient light level is high.');
+            setModalVisible(true);
+        } else if (illum < 100) {
+            setNotification('Low Light Alert: The ambient light level is low.');
+            setModalVisible(true);
+        } else {
+            setNotification(null);
+            setModalVisible(false);
+        }
+    };
+
+    const renderModal = () => {
+        return (
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    setModalVisible(!modalVisible);
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>{notification}</Text>
+                        <TouchableHighlight
+                            style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+                            onPress={() => {
+                                setModalVisible(!modalVisible);
+                            }}
+                        >
+                            <Text style={styles.textStyle}>Dismiss</Text>
+                        </TouchableHighlight>
+                    </View>
+                </View>
+            </Modal>
+        );
+    };
+
+    useEffect(() => {
+        if (illuminance > 0) {
+            setIconColor("yellow");
+        } else {
+            setIconColor("#333");
+        }
+    }, [illuminance]);
+
+    return (
+        <View style={styles.container}>
+            <View style={styles.sensor}>
+                <FontAwesome5 name={'lightbulb'} size={100} color={iconColor} style={styles.icon} />
+
+                <Text style={styles.sensorText}>Light Sensor</Text>
+                <Text style={styles.sensorValue}>{Platform.OS === 'android' ? `${illuminance} lx` : `Only available on Android`}</Text>
+                <TouchableOpacity onPress={_toggle} style={styles.toggleButton}>
+                    <Text style={styles.toggleButtonText}>{subscription ? "Stop" : "Start"} Monitoring</Text>
+                </TouchableOpacity>
+            </View>
+            {renderModal()}
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  text: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#FFFFFF', 
+        paddingHorizontal: 20,
+        paddingVertical: 200,
+    },
+    sensor: {
+        alignItems: 'center',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 20,
+        padding: 20,
+        width: '100%', 
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+    },
+    icon: {
+        marginBottom: 20,
+    },
+    sensorText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    sensorValue: {
+        fontSize: 18,
+        marginBottom: 20,
+    },
+    toggleButton: {
+        backgroundColor: '#2196F3',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 10,
+    },
+    toggleButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 10,
+    },
+    modalView: {
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    openButton: {
+        backgroundColor: "#F194FF",
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2,
+    },
+    textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center",
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: "center",
+    },
 });
