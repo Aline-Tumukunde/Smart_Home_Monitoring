@@ -121,13 +121,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 20,
     color: '#333',
-    // fontFamily: 'italic',
     fontStyle: 'italic',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '80%',
+    marginBottom: 20,
   },
   button: {
     paddingHorizontal: 20,
@@ -136,6 +136,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Arial',
   },
   activityIndicator: {
-    marginTop: 10,
+    marginBottom: 10, // Reduce the margin from the top
   },
 });
