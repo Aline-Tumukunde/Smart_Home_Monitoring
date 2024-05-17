@@ -40,7 +40,7 @@ export default function App() {
     <NavigationContainer>
       <Drawer.Navigator>
         <Drawer.Screen
-          name="Welcome"
+          name="Dashboard"
           component={WelcomeScreen}
           options={{
             drawerIcon: ({ color, size }) => (

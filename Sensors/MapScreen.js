@@ -2,15 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-const HOME_COORDINATES = { latitude: 37.7749, longitude: -122.4194 }; 
-const WORK_COORDINATES = { latitude: 37.7749, longitude: -122.4194 }; 
+const HOME_COORDINATES = { latitude: 37.7749, longitude: -122.4194 };
+const WORK_COORDINATES = { latitude: 37.7749, longitude: -122.4194 };
 
 export default function App() {
   const [region, setRegion] = useState(null);
 
   useEffect(() => {
     (async () => {
-      
+
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         console.error('Permission to access location was denied');
@@ -35,7 +35,7 @@ export default function App() {
     const { latitude, longitude } = currentCoords;
     const latDiff = Math.abs(latitude - geofenceCoords.latitude);
     const longDiff = Math.abs(longitude - geofenceCoords.longitude);
-    return latDiff < 0.001 && longDiff < 0.001; 
+    return latDiff < 0.001 && longDiff < 0.001;
   };
 
   return (
