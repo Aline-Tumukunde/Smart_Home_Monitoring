@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, Platform, Modal, TouchableHighlight } from 'react-native';
 import { LightSensor } from 'expo-sensors';
 import { FontAwesome5 } from '@expo/vector-icons';
-import * as Notifications from 'expo-notifications';
 
 export default function LightSensorComponent() {
     const [illuminance, setIlluminance] = useState(0);
@@ -93,8 +92,8 @@ export default function LightSensorComponent() {
             <View style={styles.sensor}>
                 <FontAwesome5 name={'lightbulb'} size={100} color={iconColor} style={styles.icon} />
 
-                <Text style={styles.sensorText}>Light Sensor</Text>
-                <Text style={styles.sensorValue}>{Platform.OS === 'android' ? `${illuminance} lx` : `Only available on Android`}</Text>
+                <Text style={[styles.sensorText, { color: '#fff' }]}>Light Sensor</Text>
+                <Text style={[styles.sensorValue, { color: '#fff' }]}>{Platform.OS === 'android' ? `${illuminance} lx` : `Only available on Android`}</Text>
                 <TouchableOpacity onPress={_toggle} style={styles.toggleButton}>
                     <Text style={styles.toggleButtonText}>{subscription ? "Stop" : "Start"} Monitoring</Text>
                 </TouchableOpacity>
@@ -109,13 +108,13 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#FFFFFF', 
+        backgroundColor: '#34495e', // Container background color
         paddingHorizontal: 20,
-        paddingVertical: 200,
+        paddingTop: 50,
     },
     sensor: {
         alignItems: 'center',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#81A0BF', // Data container background color
         borderRadius: 20,
         padding: 20,
         width: '100%', 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, Button, StyleSheet, ActivityIndicator, Alert, Animated } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
 
 export default function StepCounter() {
   const [steps, setSteps] = useState(0);
@@ -27,14 +28,9 @@ export default function StepCounter() {
         } else if (isPeak && acceleration < lastAcceleration) {
           setIsPeak(false);
           if (delta > threshold) {
-            setSteps(prevSteps => {
-              animateSteps();
-              return prevSteps + 1;
-            });
-          } else {
-            if (delta > threshold / 2) { 
-              Alert.alert('Other Motion Detected');
-            }
+            setSteps(prevSteps => prevSteps + 1);
+          } else if (delta > threshold / 2) {
+            Alert.alert('Other Motion Detected', 'Other motion detected, but not counted as a step.');
           }
         }
       }
@@ -69,13 +65,13 @@ export default function StepCounter() {
   const animateSteps = () => {
     Animated.sequence([
       Animated.timing(translateYAnimation, {
-        toValue: -50, // Adjust this value to control how far the steps move upwards
-        duration: 250, // Adjust animation duration as needed
+        toValue: -10,
+        duration: 100,
         useNativeDriver: true,
       }),
       Animated.timing(translateYAnimation, {
         toValue: 0,
-        duration: 250,
+        duration: 100,
         useNativeDriver: true,
       }),
     ]).start();
@@ -87,21 +83,32 @@ export default function StepCounter() {
 
   return (
     <View style={styles.container}>
-      <Animated.View style={{ transform: [{ translateY: translateYAnimation }] }}>
-        <Text style={styles.text}>🦵</Text>
-      </Animated.View>
-      <Text style={styles.text}>Steps: {steps}</Text>
+      <AnimatedCircularProgress
+        size={200}
+        width={20}
+        fill={(steps % 10000) / 100}
+        tintColor="#00e0ff"
+        backgroundColor="#3d5875"
+        lineCap="round"
+        rotation={0}
+        style={styles.circularProgress}
+      >
+        {() => (
+          <View style={styles.progressContent}>
+            <Text style={styles.stepCounter}>{steps}</Text>
+            <Text style={styles.stepText}>Steps</Text>
+          </View>
+        )}
+      </AnimatedCircularProgress>
       <View style={styles.buttonContainer}>
         <Button
           title={isTracking ? 'Stop Tracking' : 'Start Tracking'}
           onPress={() => setIsTracking(prevState => !prevState)}
-          style={styles.button}
           color={isTracking ? "#dc3545" : "#007bff"}
         />
         <Button
           title="Reset Steps"
           onPress={resetSteps}
-          style={styles.button}
           color="#dc3545"
         />
       </View>
@@ -115,27 +122,32 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: '#f5f6fa',
+    paddingHorizontal: 20,
   },
-  text: {
-    fontSize: 24,
-    marginBottom: 20,
-    color: '#333',
-    fontStyle: 'italic',
+  circularProgress: {
+    marginBottom: 40,
+  },
+  progressContent: {
+    alignItems: 'center',
+  },
+  stepCounter: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    color: '#00e0ff',
+  },
+  stepText: {
+    fontSize: 20,
+    color: '#3d5875',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    width: '80%',
+    width: '100%',
     marginBottom: 20,
   },
-  button: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 5,
-    fontFamily: 'Arial',
-  },
   activityIndicator: {
-    marginBottom: 10, // Reduce the margin from the top
+    marginBottom: 10,
   },
 });
+ghu
