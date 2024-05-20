@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Alert } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-const HOME_COORDINATES = { latitude: 37.7749, longitude: -122.4194 };
-const WORK_COORDINATES = { latitude: 37.7749, longitude: -122.4194 };
+
+const HOME_COORDINATES = { latitude: -1.9441, longitude: 30.0919 }; 
 
 export default function App() {
   const [region, setRegion] = useState(null);
 
   useEffect(() => {
     (async () => {
-
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         console.error('Permission to access location was denied');
@@ -24,13 +23,12 @@ export default function App() {
     const { latitude, longitude } = location.coords;
     setRegion({ latitude, longitude });
     if (isInsideGeofence(location.coords, HOME_COORDINATES)) {
-      console.log('Device is at home');
-    }
-
-    if (isInsideGeofence(location.coords, WORK_COORDINATES)) {
-      console.log('Device is at work');
+      Alert.alert('Home', 'Device is at home');
+    } else {
+      Alert.alert('Not Home', 'Device is not at home');
     }
   };
+
   const isInsideGeofence = (currentCoords, geofenceCoords) => {
     const { latitude, longitude } = currentCoords;
     const latDiff = Math.abs(latitude - geofenceCoords.latitude);
